@@ -1,0 +1,35 @@
+/* Secondary font for body text */
+@import url('https://fonts.googleapis.com/css2?family=Winky+Rough:ital,wght@0,300..900;1,300..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+/* @font-face {
+  font-family: "Winky Rough";
+  src: url("/fonts/WinkyRough-Regular.woff2") format("woff2"), url("/fonts/WinkyRough-Regular.woff") format("woff"),
+    url("/fonts/WinkyRough-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@font-face {
+  font-family: "Winky Rough";
+  src: url("/fonts/WinkyRough-Bold.woff2") format("woff2"), url("/fonts/WinkyRough-Bold.woff") format("woff"),
+    url("/fonts/WinkyRough-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+} */
+
+.font-winky {
+  font-family: "Winky Rough", cursive !important;
+}
+
+.font-body {
+  font-family: "Poppins", sans-serif;
+}

@@ -1,0 +1,20 @@
+{
+  "GEMSToken": {
+    "currentVersion": "1.0.0",
+    "compatibleWithFrontend": "1.0.0",
+    "breaking": [],
+    "lastUpdated": "2025-05-23"
+  },
+  "MinerNFT": {
+    "currentVersion": "1.0.0",
+    "compatibleWithFrontend": "1.0.0",
+    "breaking": [],
+    "lastUpdated": "2025-05-23"
+  },
+  "MiningMastersStaking": {
+    "currentVersion": "1.0.0",
+    "compatibleWithFrontend": "1.0.0",
+    "breaking": [],
+    "lastUpdated": "2025-05-23"
+  }
+}
