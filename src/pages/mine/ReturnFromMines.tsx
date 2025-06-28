@@ -7,6 +7,7 @@ import {
 import { getContractAddress } from "@/config/contracts";
 import { useExpeditions } from "@/hooks/useExpeditions";
 import { useStaking } from "@/hooks/useStaking";
+import { useGEMSService } from "@/services/contracts/GEMSService";
 import { useRoninWallet } from "@/services/wallet/RoninWalletProvider";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
@@ -27,7 +28,11 @@ export default function ReturnFromMines() {
   const [processingStatus, setProcessingStatus] = useState<string>("");
   const [connectedAddress, setConnectedAddress] = useState<string>("");
 
+  // Use the GEMS service to get token balance
+  const { getBalance } = useGEMSService();
+
   const { connector } = useRoninWallet();
+
   const { readyToComplete, refetch, statuses } = useExpeditions(15000);
   const { stakedMiners } = useStaking();
 
@@ -96,6 +101,11 @@ export default function ReturnFromMines() {
       const provider = new ethers.BrowserProvider(connector!.provider);
       const signer = await provider.getSigner();
       const connectedAddress = await signer.getAddress();
+      // console.log("TCL: handleReturnInternal -> connectedAddress", connectedAddress)
+
+      const fetchedGemsbalanceOld: any = await getBalance(connectedAddress, false);
+
+      // console.log('Received GEMS balance: CustomBalance', fetchedGemsbalanceOld);
 
       const expAddress = getContractAddress("MiningExpeditionProxy");
       const stakingAddress = getContractAddress("StakingProxy");
@@ -117,10 +127,10 @@ export default function ReturnFromMines() {
         "function balanceOf(address owner) external view returns (uint256)"
       ];
 
-  
+
       const expedition = new ethers.Contract(expAddress, expeditionAbi, signer);
       const staking = new ethers.Contract(stakingAddress, stakingAbi, provider);
-     
+
 
 
       // Check blockchain time for diagnostics
@@ -128,27 +138,27 @@ export default function ReturnFromMines() {
       const block = await provider.getBlock(blockNumber);
       const blockchainTime = block?.timestamp || Math.floor(Date.now() / 1000);
       const localTime = Math.floor(Date.now() / 1000);
-      console.log(`[ReturnFromMines] Time diagnostics:`, {
-        blockchainTime,
-        localTime,
-        diff: localTime - blockchainTime,
-        blockNumber,
-      });
+      // console.log(`[ReturnFromMines] Time diagnostics:`, {
+      //   blockchainTime,
+      //   localTime,
+      //   diff: localTime - blockchainTime,
+      //   blockNumber,
+      // });
 
       // Get current expedition time setting
       const cooldownTime = await expedition.MINING_COOLDOWN();
-      console.log(
-        `[ReturnFromMines] Current expedition duration setting: ${cooldownTime} seconds`
-      );
+      // console.log(
+      //   `[ReturnFromMines] Current expedition duration setting: ${cooldownTime} seconds`
+      // );
 
       // Get potential miners to complete
       const potentialMinerIds = readyToComplete.map(
         ({ minerId }: { minerId: number }) => minerId
       );
-      console.log(
-        `[ReturnFromMines] Checking ownership for miners:`,
-        potentialMinerIds
-      );
+      // console.log(
+      //   `[ReturnFromMines] Checking ownership for miners:`,
+      //   potentialMinerIds
+      // );
 
       // Verify ownership of each miner
       const ownedMinerIds: number[] = [];
@@ -164,15 +174,15 @@ export default function ReturnFromMines() {
             ownedMinerIds.push(minerId);
           } else {
             unownedMinerIds.push(minerId);
-            console.log(
-              `[ReturnFromMines] Miner ${minerId} not owned by connected wallet (owner: ${owner})`
-            );
+            // console.log(
+            //   `[ReturnFromMines] Miner ${minerId} not owned by connected wallet (owner: ${owner})`
+            // );
           }
         } catch (err) {
-          console.warn(
-            `[ReturnFromMines] Error checking ownership for miner ${minerId}:`,
-            err
-          );
+          // console.warn(
+          //   `[ReturnFromMines] Error checking ownership for miner ${minerId}:`,
+          //   err
+          // );
           unownedMinerIds.push(minerId);
         }
       }
@@ -186,15 +196,15 @@ export default function ReturnFromMines() {
 
       // If some miners are unowned, show a warning but proceed with owned ones
       if (unownedMinerIds.length > 0) {
-        console.warn(
-          `[ReturnFromMines] Skipping ${unownedMinerIds.length} miners not owned by connected wallet`
-        );
+        // console.warn(
+        //   `[ReturnFromMines] Skipping ${unownedMinerIds.length} miners not owned by connected wallet`
+        // );
       }
 
-      console.log(
-        `[ReturnFromMines] Attempting to complete expeditions for owned miners:`,
-        ownedMinerIds
-      );
+      // console.log(
+      //   `[ReturnFromMines] Attempting to complete expeditions for owned miners:`,
+      //   ownedMinerIds
+      // );
 
       // Initialize miners that are truly ready according to blockchain time
       let validatedMinerIds: number[] = [];
@@ -215,18 +225,18 @@ export default function ReturnFromMines() {
             const completed = expeditionData[2];
             const successful = expeditionData[3];
 
-            console.log(`[ReturnFromMines] Miner ${id} expedition data:`, {
-              startTime,
-              endTime,
-              completed,
-              successful,
-              blockchainTime: latestBlockchainTime,
-              readyStatus:
-                latestBlockchainTime >= endTime
-                  ? "READY"
-                  : `NOT READY (${endTime - latestBlockchainTime}s remaining)`,
-              startedStatus: startTime > 0 ? "STARTED" : "NOT STARTED",
-            });
+            // console.log(`[ReturnFromMines] Miner ${id} expedition data:`, {
+            //   startTime,
+            //   endTime,
+            //   completed,
+            //   successful,
+            //   blockchainTime: latestBlockchainTime,
+            //   readyStatus:
+            //     latestBlockchainTime >= endTime
+            //       ? "READY"
+            //       : `NOT READY (${endTime - latestBlockchainTime}s remaining)`,
+            //   startedStatus: startTime > 0 ? "STARTED" : "NOT STARTED",
+            // });
 
             // Verify if this miner is actually ready according to blockchain time
             if (
@@ -244,37 +254,37 @@ export default function ReturnFromMines() {
               notReadyMiners.push({ minerId: id, reason });
             }
           } catch (err) {
-            console.warn(
-              `[ReturnFromMines] Error checking expedition data for miner ${id}:`,
-              err
-            );
+            // console.warn(
+            //   `[ReturnFromMines] Error checking expedition data for miner ${id}:`,
+            //   err
+            // );
             notReadyMiners.push({ minerId: id, reason: "Error checking data" });
           }
         }
 
         // Report on our findings
         if (actuallyReadyMiners.length === 0) {
-          console.warn(
-            "[ReturnFromMines] No miners are actually ready according to blockchain time!"
-          );
-          console.warn("[ReturnFromMines] Not ready miners:", notReadyMiners);
+          // console.warn(
+          //   "[ReturnFromMines] No miners are actually ready according to blockchain time!"
+          // );
+          // console.warn("[ReturnFromMines] Not ready miners:", notReadyMiners);
           throw new Error(
             "No miners are ready for expedition completion according to blockchain time."
           );
         } else if (notReadyMiners.length > 0) {
-          console.warn(
-            `[ReturnFromMines] ${notReadyMiners.length} miners not ready, proceeding with ${actuallyReadyMiners.length} ready miners`
-          );
-          console.warn("[ReturnFromMines] Not ready miners:", notReadyMiners);
+          // console.warn(
+          //   `[ReturnFromMines] ${notReadyMiners.length} miners not ready, proceeding with ${actuallyReadyMiners.length} ready miners`
+          // );
+          // console.warn("[ReturnFromMines] Not ready miners:", notReadyMiners);
         }
 
         // Update validated miners list with those truly ready according to blockchain time
         validatedMinerIds = actuallyReadyMiners;
       } catch (error) {
-        console.warn(
-          "[ReturnFromMines] Error validating expedition readiness:",
-          error
-        );
+        // console.warn(
+        //   "[ReturnFromMines] Error validating expedition readiness:",
+        //   error
+        // );
         throw error;
       }
 
@@ -285,16 +295,16 @@ export default function ReturnFromMines() {
         );
       }
 
-      console.log(
-        `[ReturnFromMines] Calling completeExpeditions with validated IDs:`,
-        validatedMinerIds
-      );
+      // console.log(
+      //   `[ReturnFromMines] Calling completeExpeditions with validated IDs:`,
+      //   validatedMinerIds
+      // );
 
       // CRITICAL: Double-verify ownership right before sending transaction
       const doubleCheckedMinerIds: number[] = [];
-      console.log(
-        `[ReturnFromMines] CRITICAL - Double checking ownership before transaction...`
-      );
+      // console.log(
+      //   `[ReturnFromMines] CRITICAL - Double checking ownership before transaction...`
+      // );
 
       for (const minerId of validatedMinerIds) {
         try {
@@ -305,31 +315,31 @@ export default function ReturnFromMines() {
           const connectedAddressLower = connectedAddress.toLowerCase();
           const ownerMatch = actualOwnerLower === connectedAddressLower;
 
-          console.log(
-            `[ReturnFromMines] Ownership verification for miner ${minerId}:`,
-            {
-              actualOwner,
-              actualOwnerLower,
-              connectedAddress,
-              connectedAddressLower,
-              isActuallyStaked,
-              ownerMatch,
-              contractCallFrom: await signer.getAddress(),
-            }
-          );
+          // console.log(
+          //   `[ReturnFromMines] Ownership verification for miner ${minerId}:`,
+          //   {
+          //     actualOwner,
+          //     actualOwnerLower,
+          //     connectedAddress,
+          //     connectedAddressLower,
+          //     isActuallyStaked,
+          //     ownerMatch,
+          //     contractCallFrom: await signer.getAddress(),
+          //   }
+          // );
 
           if (isActuallyStaked && ownerMatch) {
             doubleCheckedMinerIds.push(minerId);
           } else {
-            console.warn(
-              `[ReturnFromMines] ⚠️ CRITICAL: Miner ${minerId} ownership verification failed in final check`
-            );
+            // console.warn(
+            //   `[ReturnFromMines] ⚠️ CRITICAL: Miner ${minerId} ownership verification failed in final check`
+            // );
           }
         } catch (err) {
-          console.error(
-            `[ReturnFromMines] Error in final ownership verification for miner ${minerId}:`,
-            err
-          );
+          // console.error(
+          //   `[ReturnFromMines] Error in final ownership verification for miner ${minerId}:`,
+          //   err
+          // );
         }
       }
 
@@ -341,15 +351,15 @@ export default function ReturnFromMines() {
       }
 
       if (doubleCheckedMinerIds.length !== validatedMinerIds.length) {
-        console.warn(
-          `[ReturnFromMines] ⚠️ Some miners failed final ownership check. Originally had ${validatedMinerIds.length}, now have ${doubleCheckedMinerIds.length}`
-        );
+        // console.warn(
+        //   `[ReturnFromMines] ⚠️ Some miners failed final ownership check. Originally had ${validatedMinerIds.length}, now have ${doubleCheckedMinerIds.length}`
+        // );
       }
 
-      console.log(
-        `[ReturnFromMines] Final transaction will include these miners:`,
-        doubleCheckedMinerIds
-      );
+      // console.log(
+      //   `[ReturnFromMines] Final transaction will include these miners:`,
+      //   doubleCheckedMinerIds
+      // );
 
       // Snapshot pending rewards before completing expeditions
       const prevPendingRewards: bigint = await staking.getPendingRewards(
@@ -389,9 +399,9 @@ export default function ReturnFromMines() {
             !isActuallyStaked ||
             actualOwner.toLowerCase() !== callerAddress.toLowerCase()
           ) {
-            console.error(
-              `[ReturnFromMines] Final ownership check failed for miner ${minerId}. Expected: ${callerAddress}, Got: ${actualOwner}`
-            );
+            // console.error(
+            //   `[ReturnFromMines] Final ownership check failed for miner ${minerId}. Expected: ${callerAddress}, Got: ${actualOwner}`
+            // );
             failedMiners.push({
               minerId: minerId,
               error: "Ownership validation failed",
@@ -400,9 +410,9 @@ export default function ReturnFromMines() {
           }
 
           // Attempt to complete this single miner's expedition
-          console.log(
-            `[ReturnFromMines] Attempting to complete expedition for miner: ${minerId}`
-          );
+          // console.log(
+          //   `[ReturnFromMines] Attempting to complete expedition for miner: ${minerId}`
+          // );
 
           // Try both single miner completion and batch completion as fallback
           let tx;
@@ -415,7 +425,7 @@ export default function ReturnFromMines() {
               const miniExp = new ethers.Contract(expAddress, miniExpAbi, provider);
               vrfCoordinatorAddr = await miniExp.vrfCoordinator();
             } catch (e) {
-              console.warn("[ReturnFromMines] Could not read vrfCoordinator from contract, using fallback", e);
+              // console.warn("[ReturnFromMines] Could not read vrfCoordinator from contract, using fallback", e);
               vrfCoordinatorAddr = (import.meta.env.VITE_VRF_COORDINATOR as string) ||
                 (import.meta.env.VRF_COORDINATOR as string) ||
                 "0xa60c1e07fa030e4b49eb54950adb298ab94dd312"; // Saigon default
@@ -450,9 +460,9 @@ export default function ReturnFromMines() {
               tx = await expedition.completeExpedition(BigInt(minerId));
             } else {
               // Fallback to batch completion with a single miner
-              console.log(
-                `[ReturnFromMines] Single miner completion not available, using batch method for miner: ${minerId}`
-              );
+              // console.log(
+              //   `[ReturnFromMines] Single miner completion not available, using batch method for miner: ${minerId}`
+              // );
               tx = await expedition.completeExpeditions([minerId]);
             }
             const receipt = await tx.wait();
@@ -480,10 +490,10 @@ export default function ReturnFromMines() {
       }
 
       // Log the results for debugging
-      console.log(`[ReturnFromMines] Individual completion results:`, {
-        successfulMiners,
-        failedMiners,
-      });
+      // console.log(`[ReturnFromMines] Individual completion results:`, {
+      //   successfulMiners,
+      //   failedMiners,
+      // });
 
       if (successfulMiners.length === 0) {
         throw new Error(
@@ -491,21 +501,32 @@ export default function ReturnFromMines() {
         );
       }
 
+      const fetchGemsbalanceNew: any = await getBalance(connectedAddress, false);
+
+      console.log('Received GEMS balance: CustomBalance', fetchGemsbalanceNew);
+
       // Aggregate rewards via staking pending rewards difference
       setStatusForUser(`Fetching updated pending rewards...`);
 
       const afterPendingRewards: bigint = await staking.getPendingRewards(
         connectedAddress
       );
-      const diff = afterPendingRewards - prevPendingRewards;
-      const totalGems = parseFloat(ethers.formatUnits(diff, 18));
 
-      const anySuccess = successfulMiners.length > 0 && diff > 0n;
+      const diff = fetchGemsbalanceNew - fetchedGemsbalanceOld;
+      // console.log("TCL: ReturnFromMines -> afterPendingRewards", afterPendingRewards)
+      // console.log("TCL: ReturnFromMines -> prevPendingRewards", prevPendingRewards)
 
-      console.log(`[ReturnFromMines] Pending rewards diff:`, diff.toString());
+      const totalGems = diff
+      //  parseFloat(ethers.formatUnits(diff, 18));
+      // console.log(`[ReturnFromMines] Pending rewards diff:`, diff);
+      // console.log("TCL: ReturnFromMines -> totalGems", totalGems)
 
 
-      setMiningResults({ success: true, rewards: { gems: 10 } });
+      // console.log("TCL: ReturnFromMines -> diff", diff)
+      const anySuccess = successfulMiners.length > 0 && diff > 0;
+      // console.log("TCL: ReturnFromMines -> anySuccess", anySuccess)
+      // debugger;
+      setMiningResults({ success: anySuccess, rewards: { gems: totalGems } });
       setShowResults(true);
 
       // refresh statuses
@@ -605,6 +626,7 @@ export default function ReturnFromMines() {
     setShowResults(false);
     setMiningResults(null);
     refetch();
+    window.location.reload();
   };
 
   const handleReduceTime = async () => {
