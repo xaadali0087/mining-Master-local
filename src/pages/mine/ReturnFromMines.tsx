@@ -134,10 +134,10 @@ export default function ReturnFromMines() {
 
 
       // Check blockchain time for diagnostics
-      const blockNumber = await provider.getBlockNumber();
-      const block = await provider.getBlock(blockNumber);
-      const blockchainTime = block?.timestamp || Math.floor(Date.now() / 1000);
-      const localTime = Math.floor(Date.now() / 1000);
+      // const blockNumber = await provider.getBlockNumber();
+      // const block = await provider.getBlock(blockNumber);
+      // const blockchainTime = block?.timestamp || Math.floor(Date.now() / 1000);
+      // const localTime = Math.floor(Date.now() / 1000);
       // console.log(`[ReturnFromMines] Time diagnostics:`, {
       //   blockchainTime,
       //   localTime,
@@ -146,7 +146,7 @@ export default function ReturnFromMines() {
       // });
 
       // Get current expedition time setting
-      const cooldownTime = await expedition.MINING_COOLDOWN();
+      // const cooldownTime = await expedition.MINING_COOLDOWN();
       // console.log(
       //   `[ReturnFromMines] Current expedition duration setting: ${cooldownTime} seconds`
       // );
@@ -223,7 +223,7 @@ export default function ReturnFromMines() {
             const startTime = Number(expeditionData[0]);
             const endTime = Number(expeditionData[1]);
             const completed = expeditionData[2];
-            const successful = expeditionData[3];
+            // const successful = expeditionData[3];
 
             // console.log(`[ReturnFromMines] Miner ${id} expedition data:`, {
             //   startTime,
@@ -362,9 +362,9 @@ export default function ReturnFromMines() {
       // );
 
       // Snapshot pending rewards before completing expeditions
-      const prevPendingRewards: bigint = await staking.getPendingRewards(
-        connectedAddress
-      );
+      // const prevPendingRewards: bigint = await staking.getPendingRewards(
+      //   connectedAddress
+      // );
 
       // Using a different approach: try to complete one miner at a time to isolate which ones have issues
       const successfulMiners: number[] = [];
@@ -372,7 +372,7 @@ export default function ReturnFromMines() {
 
       // Update UI status to show processing progress
       const setStatusForUser = (status: string) => {
-        console.log(`[ReturnFromMines] Status: ${status}`);
+        // console.log(`[ReturnFromMines] Status: ${status}`);
         setProcessingStatus(status);
       };
 
@@ -445,18 +445,21 @@ export default function ReturnFromMines() {
               fee = fee + fee / 5n; // add 20% buffer
               if (fee < minFee) fee = minFee;
             } catch (e) {
-              console.warn("[ReturnFromMines] estimateRequestRandomFee failed, defaulting fee", e);
+              // console.warn("[ReturnFromMines] estimateRequestRandomFee failed, defaulting fee", e);
               fee = 50_000_000_000_000_000n; // 0.05 RON fallback
             }
-            console.log(`[ReturnFromMines] Estimated VRF fee for miner ${minerId}:`, fee.toString());
+            // console.log(`[ReturnFromMines] Estimated VRF fee for miner ${minerId}:`, fee.toString());
             // debugger
             if (typeof expedition.completeExpedition === "function") {
               // Perform a static call first to detect obvious revert reasons (optional but helpful)
               try {
+                // await expedition.completeExpedition.staticCall(BigInt(minerId), { value: fee });
                 await expedition.completeExpedition.staticCall(BigInt(minerId));
               } catch (simErr) {
                 console.error(`[ReturnFromMines] Static call revert reason for miner ${minerId}:`, simErr);
               }
+              // tx = await expedition.completeExpedition(BigInt(minerId), { value: fee, gasLimit: 500_000 });
+
               tx = await expedition.completeExpedition(BigInt(minerId));
             } else {
               // Fallback to batch completion with a single miner
@@ -466,9 +469,9 @@ export default function ReturnFromMines() {
               tx = await expedition.completeExpeditions([minerId]);
             }
             const receipt = await tx.wait();
-            console.log(
-              `[ReturnFromMines] Successfully completed expedition for miner: ${minerId}, hash: ${receipt.hash}`
-            );
+            // console.log(
+            //   `[ReturnFromMines] Successfully completed expedition for miner: ${minerId}, hash: ${receipt.hash}`
+            // );
             successfulMiners.push(minerId);
           } catch (innerErr: any) {
             // If this specific approach fails, it will be caught by the outer catch block
@@ -503,14 +506,14 @@ export default function ReturnFromMines() {
 
       const fetchGemsbalanceNew: any = await getBalance(connectedAddress, false);
 
-      console.log('Received GEMS balance: CustomBalance', fetchGemsbalanceNew);
+      // console.log('Received GEMS balance: CustomBalance', fetchGemsbalanceNew);
 
       // Aggregate rewards via staking pending rewards difference
       setStatusForUser(`Fetching updated pending rewards...`);
 
-      const afterPendingRewards: bigint = await staking.getPendingRewards(
-        connectedAddress
-      );
+      // const afterPendingRewards: bigint = await staking.getPendingRewards(
+      //   connectedAddress
+      // );
 
       const diff = fetchGemsbalanceNew - fetchedGemsbalanceOld;
       // console.log("TCL: ReturnFromMines -> afterPendingRewards", afterPendingRewards)
@@ -707,7 +710,7 @@ export default function ReturnFromMines() {
             {miningResults?.success ? (
               <div className="text-center">
                 <p className="text-green-400 text-xl mb-4 font-winky">
-                  Your miners returned with {miningResults.rewards.gems || 10} gems!
+                  Your miners returned with {miningResults.rewards.gems} gems!
                 </p>
               </div>
             ) : (
