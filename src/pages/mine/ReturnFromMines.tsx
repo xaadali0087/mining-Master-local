@@ -516,20 +516,13 @@ export default function ReturnFromMines() {
       );
 
       const diff = afterPendingRewards - prevPendingRewards;
-      // console.log("TCL: ReturnFromMines -> afterPendingRewards", afterPendingRewards)
-      // console.log("TCL: ReturnFromMines -> prevPendingRewards", prevPendingRewards)
+
+      const anySuccess = successfulMiners.length > 0 && diff > 0n;
 
       const totalGems = parseFloat(ethers.formatUnits(diff, 18));
-      // console.log(`[ReturnFromMines] Pending rewards diff:`, diff);
-      // console.log("TCL: ReturnFromMines -> totalGems", totalGems)
-      // debugger;
 
 
-      // console.log("TCL: ReturnFromMines -> diff", diff)
-      const anySuccess = successfulMiners.length > 0 && diff > 0;
-      // console.log("TCL: ReturnFromMines -> anySuccess", anySuccess)
-      // debugger;
-      setMiningResults({ success: anySuccess, rewards: { gems: totalGems } });
+      setMiningResults({ success: anySuccess, rewards: { gems: Number(totalGems?.toFixed(4)) } });
       setShowResults(true);
 
       // refresh statuses
