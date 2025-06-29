@@ -103,7 +103,7 @@ export default function ReturnFromMines() {
       const connectedAddress = await signer.getAddress();
       // console.log("TCL: handleReturnInternal -> connectedAddress", connectedAddress)
 
-      const fetchedGemsbalanceOld: any = await getBalance(connectedAddress, false);
+      // const fetchedGemsbalanceOld: any = await getBalance(connectedAddress, false);
 
       // console.log('Received GEMS balance: CustomBalance', fetchedGemsbalanceOld);
 
@@ -362,9 +362,9 @@ export default function ReturnFromMines() {
       // );
 
       // Snapshot pending rewards before completing expeditions
-      // const prevPendingRewards: bigint = await staking.getPendingRewards(
-      //   connectedAddress
-      // );
+      const prevPendingRewards: bigint = await staking.getPendingRewards(
+        connectedAddress
+      );
 
       // Using a different approach: try to complete one miner at a time to isolate which ones have issues
       const successfulMiners: number[] = [];
@@ -504,25 +504,25 @@ export default function ReturnFromMines() {
         );
       }
 
-      const fetchGemsbalanceNew: any = await getBalance(connectedAddress, false);
+      // const fetchGemsbalanceNew: any = await getBalance(connectedAddress, false);
 
       // console.log('Received GEMS balance: CustomBalance', fetchGemsbalanceNew);
 
       // Aggregate rewards via staking pending rewards difference
       setStatusForUser(`Fetching updated pending rewards...`);
 
-      // const afterPendingRewards: bigint = await staking.getPendingRewards(
-      //   connectedAddress
-      // );
+      const afterPendingRewards: bigint = await staking.getPendingRewards(
+        connectedAddress
+      );
 
-      const diff = fetchGemsbalanceNew - fetchedGemsbalanceOld;
-      // console.log("TCL: ReturnFromMines -> afterPendingRewards", afterPendingRewards)
-      // console.log("TCL: ReturnFromMines -> prevPendingRewards", prevPendingRewards)
+      const diff = afterPendingRewards - prevPendingRewards;
+      console.log("TCL: ReturnFromMines -> afterPendingRewards", afterPendingRewards)
+      console.log("TCL: ReturnFromMines -> prevPendingRewards", prevPendingRewards)
 
-      const totalGems = diff
-      //  parseFloat(ethers.formatUnits(diff, 18));
-      // console.log(`[ReturnFromMines] Pending rewards diff:`, diff);
-      // console.log("TCL: ReturnFromMines -> totalGems", totalGems)
+      const totalGems = parseFloat(ethers.formatUnits(diff, 18));
+      console.log(`[ReturnFromMines] Pending rewards diff:`, diff);
+      console.log("TCL: ReturnFromMines -> totalGems", totalGems)
+      debugger;
 
 
       // console.log("TCL: ReturnFromMines -> diff", diff)
