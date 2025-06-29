@@ -516,13 +516,13 @@ export default function ReturnFromMines() {
       );
 
       const diff = afterPendingRewards - prevPendingRewards;
-      console.log("TCL: ReturnFromMines -> afterPendingRewards", afterPendingRewards)
-      console.log("TCL: ReturnFromMines -> prevPendingRewards", prevPendingRewards)
+      // console.log("TCL: ReturnFromMines -> afterPendingRewards", afterPendingRewards)
+      // console.log("TCL: ReturnFromMines -> prevPendingRewards", prevPendingRewards)
 
       const totalGems = parseFloat(ethers.formatUnits(diff, 18));
-      console.log(`[ReturnFromMines] Pending rewards diff:`, diff);
-      console.log("TCL: ReturnFromMines -> totalGems", totalGems)
-      debugger;
+      // console.log(`[ReturnFromMines] Pending rewards diff:`, diff);
+      // console.log("TCL: ReturnFromMines -> totalGems", totalGems)
+      // debugger;
 
 
       // console.log("TCL: ReturnFromMines -> diff", diff)

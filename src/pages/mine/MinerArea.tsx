@@ -165,19 +165,19 @@ export default function MinerArea() {
       );
       const userAddress = await signer.getAddress();
 
-      console.log(
-        `Fetching on-chain rewards for ${userAddress} from contract ${stakingContractAddress}`
-      );
+      // console.log(
+      //   `Fetching on-chain rewards for ${userAddress} from contract ${stakingContractAddress}`
+      // );
 
       // Get the actual pending rewards from the contract
       const pendingRewards = await contract.getPendingRewards(userAddress);
       const formattedRewards = ethers.formatEther(pendingRewards);
 
-      console.log(`On-chain rewards fetched: ${formattedRewards} GEMS`);
+      // console.log(`On-chain rewards fetched: ${formattedRewards} GEMS`);
       setOnChainRewards(formattedRewards);
       setIsLoadingOnChainRewards(false);
     } catch (error) {
-      console.error("Failed to fetch on-chain rewards:", error);
+      // console.error("Failed to fetch on-chain rewards:", error);
       setIsLoadingOnChainRewards(false);
     }
   };
@@ -212,9 +212,9 @@ export default function MinerArea() {
 
     // Log discrepancy between stakedMinerCount and actual array length for debugging
     if (stakedMiners.length !== stakedMinerCount) {
-      console.warn(
-        `Miner count mismatch: stakedMinerCount=${stakedMinerCount}, stakedMiners.length=${stakedMiners.length}`
-      );
+      // console.warn(
+      //   `Miner count mismatch: stakedMinerCount=${stakedMinerCount}, stakedMiners.length=${stakedMiners.length}`
+      // );
     }
   }, [stakedMiners, stakedMinerCount]);
 
@@ -629,8 +629,8 @@ export default function MinerArea() {
                         if (
                           window.confirm(
                             "Claim " +
-                              Number(estimatedRewards).toFixed(6) +
-                              " GEMS?"
+                            Number(estimatedRewards).toFixed(6) +
+                            " GEMS?"
                           )
                         ) {
                           if (isConnected) {
@@ -687,11 +687,10 @@ export default function MinerArea() {
             <div className="bg-[#1a0d00] flex rounded-lg border border-amber-500/40 overflow-hidden">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`px-3 py-1.5 text-xs font-winky transition-colors duration-200 flex items-center ${
-                  viewMode === "grid"
-                    ? "bg-amber-500/20 text-amber-400"
-                    : "text-amber-500/70 hover:text-amber-400"
-                }`}
+                className={`px-3 py-1.5 text-xs font-winky transition-colors duration-200 flex items-center ${viewMode === "grid"
+                  ? "bg-amber-500/20 text-amber-400"
+                  : "text-amber-500/70 hover:text-amber-400"
+                  }`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -705,11 +704,10 @@ export default function MinerArea() {
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`px-3 py-1.5 text-xs font-winky transition-colors duration-200 flex items-center ${
-                  viewMode === "list"
-                    ? "bg-amber-500/20 text-amber-400"
-                    : "text-amber-500/70 hover:text-amber-400"
-                }`}
+                className={`px-3 py-1.5 text-xs font-winky transition-colors duration-200 flex items-center ${viewMode === "list"
+                  ? "bg-amber-500/20 text-amber-400"
+                  : "text-amber-500/70 hover:text-amber-400"
+                  }`}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -787,15 +785,13 @@ export default function MinerArea() {
                 >
                   {/* Tag to indicate if slot is free or costs gems */}
                   <div
-                    className={`absolute -top-1.5 -right-1.5 ${
-                      isFreeSlot || isPurchasedSlot
-                        ? "bg-green-600/80"
-                        : "bg-amber-600/80"
-                    } text-white text-[10px] px-1.5 py-0.5 rounded-full font-medium z-20 shadow-sm flex items-center backdrop-blur-sm border ${
-                      isFreeSlot || isPurchasedSlot
+                    className={`absolute -top-1.5 -right-1.5 ${isFreeSlot || isPurchasedSlot
+                      ? "bg-green-600/80"
+                      : "bg-amber-600/80"
+                      } text-white text-[10px] px-1.5 py-0.5 rounded-full font-medium z-20 shadow-sm flex items-center backdrop-blur-sm border ${isFreeSlot || isPurchasedSlot
                         ? "border-green-500/30"
                         : "border-amber-500/30"
-                    }`}
+                      }`}
                   >
                     {isFreeSlot ? (
                       <span>FREE</span>
@@ -876,13 +872,11 @@ export default function MinerArea() {
                   >
                     {/* Tag to indicate if slot is free or costs gems */}
                     <div
-                      className={`absolute -top-1.5 -right-1.5 ${
-                        isFreeSlot ? "bg-green-600/80" : "bg-amber-600/80"
-                      } text-white text-[10px] px-1.5 py-0.5 rounded-full font-medium z-20 shadow-sm flex items-center backdrop-blur-sm border ${
-                        isFreeSlot
+                      className={`absolute -top-1.5 -right-1.5 ${isFreeSlot ? "bg-green-600/80" : "bg-amber-600/80"
+                        } text-white text-[10px] px-1.5 py-0.5 rounded-full font-medium z-20 shadow-sm flex items-center backdrop-blur-sm border ${isFreeSlot
                           ? "border-green-500/30"
                           : "border-amber-500/30"
-                      }`}
+                        }`}
                     >
                       {isFreeSlot ? (
                         <span>FREE</span>
